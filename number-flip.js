@@ -27,10 +27,7 @@ export class Flip {
               ? .5 * Math.pow(pos, 3)
               : .5 * (Math.pow((pos - 2), 3) + 2)),
     systemArr = [0,1,2,3,4,5,6,7,8,9],
-    direct = true,
-    separator,
-    seperateOnly = 0,
-    separateEvery = 3
+    direct = true
   }) {
     this.beforeArr = []
     this.afterArr = []
@@ -42,9 +39,6 @@ export class Flip {
     this.to = to || 0
     this.node = node
     this.direct = direct
-    this.separator = separator
-    this.seperateOnly = seperateOnly
-    this.separateEvery = seperateOnly ? 0 : separateEvery
     this._initHTML(maxLenNum(this.from, this.to))
     if (to === undefined) return
     if (delay) setTimeout(() => this.flipTo({to: this.to}), delay * 1000)
@@ -55,7 +49,7 @@ export class Flip {
     this.node.classList.add('number-flip')
     this.node.style.position = 'relative'
     this.node.style.overflow = 'hidden'
-    
+
     for (let i = 0; i < digits; i += 1) {
       const ctnr = g(`ctnr ctnr${i}`)(
         ...this.systemArr.map(i => g('digit')(i)),
@@ -67,17 +61,18 @@ export class Flip {
       this.ctnrArr.unshift(ctnr)
       this.node.appendChild(ctnr)
       this.beforeArr.push(0)
-      if (
-        !this.separator ||
-        (!this.separateEvery && !this.seperateOnly) ||
-        i === digits - 1 ||
-        ((digits - i) % this.separateEvery != 1 && digits - i - this.seperateOnly != 1)
-      ) continue
-      const sprtrStr = isstr(this.separator) ? this.separator : this.separator.shift()
-      const sprtr = g('sprtr')(sprtrStr)
-      sprtr.style.display = 'inline-block'
-      this.node.appendChild(sprtr)
+      
     }
+    
+    const sprtr = g('sprtr')(',')
+    sprtr.style.display = 'inline-block'
+    this.node.insert(-2,sprtr) //adding the full stop
+
+    //need code to add a comma after every thousand
+    const sprtr = g('sprtr')(',')
+    sprtr.style.display = 'inline-block'
+    this.node.appendChild(sprtr)
+
 
     const resize = () => {
       this.height = this.ctnrArr[0].clientHeight / (this.systemArr.length + 1)
