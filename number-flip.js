@@ -10,6 +10,10 @@ const num2PadNumArr = (num, len) => {
   return str2NumArr(padLeftStr(num.toString(), len)).reverse()
 }
 
+Array.prototype.insert = function ( index, item ) {
+  this.splice( index, 0, item );
+};
+
 const isstr = any => Object.prototype.toString.call(any) === '[object String]'
 
 export class Flip {
@@ -51,6 +55,7 @@ export class Flip {
     this.node.classList.add('number-flip')
     this.node.style.position = 'relative'
     this.node.style.overflow = 'hidden'
+    
     for (let i = 0; i < digits; i += 1) {
       const ctnr = g(`ctnr ctnr${i}`)(
         ...this.systemArr.map(i => g('digit')(i)),
@@ -73,6 +78,7 @@ export class Flip {
       sprtr.style.display = 'inline-block'
       this.node.appendChild(sprtr)
     }
+
     const resize = () => {
       this.height = this.ctnrArr[0].clientHeight / (this.systemArr.length + 1)
       this.node.style.height = this.height + 'px'
