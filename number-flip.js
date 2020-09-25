@@ -39,7 +39,7 @@ export class Flip {
     this.to = to || 0
     this.node = node
     this.direct = direct
-    this._initHTML(maxLenNum(this.from, this.to))
+    this._initHTML(11)
     if (to === undefined) return
     if (delay) setTimeout(() => this.flipTo({to: this.to}), delay * 1000)
     else this.flipTo({to: this.to})
@@ -63,16 +63,17 @@ export class Flip {
       this.beforeArr.push(0)
       
     }
-    
+    //adding the full stop
+    const sprtr = g('sprtr')('.')
+    sprtr.style.display = 'inline-block'
+    this.node.insert(-2,sprtr) 
+
+    //adding comma 
     const sprtr = g('sprtr')(',')
     sprtr.style.display = 'inline-block'
-    this.node.insert(-2,sprtr) //adding the full stop
 
-    //need code to add a comma after every thousand
-    const sprtr = g('sprtr')(',')
-    sprtr.style.display = 'inline-block'
-    this.node.appendChild(sprtr)
-
+    this.node.insert(-6,sprtr) //adding first comma
+    this.node.insert(-10,sprtr) //adding 2nd comma
 
     const resize = () => {
       this.height = this.ctnrArr[0].clientHeight / (this.systemArr.length + 1)
