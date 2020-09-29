@@ -125,9 +125,9 @@ export class Flip {
   hide(to) {
     for (let i = 10; i > -1; i--) {
       var hide = false;
-      if (to < 10 ** i) {
+      if (to < 10 ** (i)) {
+        hide = true;
         if(this.ctnrArr[i].style.width !== "0px"){
-          hide = true;
           this.ctnrArr[i].style.width = "0px";
           this.ctnrArr[i].style.opacity = 0;
           this.ctnrArr[i].style.transition = "width .2s ";
@@ -143,7 +143,7 @@ export class Flip {
         this.commaArr[1].style.opacity = 0;
         this.commaArr[1].style.transition = "width .2s ";
 
-      } else if (i === 8) {
+      } else if (i === 8 ) {
         this.commaArr[1].style.width = "6px";
         this.commaArr[1].style.opacity = 100;
         this.commaArr[1].style.transition = "width .2s ";
