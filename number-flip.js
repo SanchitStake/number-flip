@@ -22,12 +22,14 @@ export class Flip {
         ? 0.5 * Math.pow(pos, 3)
         : 0.5 * (Math.pow(pos - 2, 3) + 2),
     systemArr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    direct = true
+    direct = true,
+    flash = true
   }) {
     this.beforeArr = [];
     this.afterArr = [];
     this.ctnrArr = [];
     this.commaArr = [];
+    this.dot=null;
     this.duration = duration * 1000;
     this.systemArr = systemArr;
     this.easeFn = easeFn;
@@ -36,6 +38,7 @@ export class Flip {
     this.node = node;
     this.direct = direct;
     this._initHTML(11);
+    this.flash = flash;
     if (to === undefined) return;
     if (delay) setTimeout(() => this.flipTo({ to: this.to }), delay * 1000);
     else this.flipTo({ to: this.to });
@@ -74,10 +77,12 @@ export class Flip {
         const dot = g("dot")(".");
         dot.style.display = "inline-block";
         this.node.appendChild(dot);
+        this.dot = dot;
       }
     }
 
     const resize = () => {
+      this.hide(this.from);
       this.height = this.ctnrArr[0].clientHeight / (this.systemArr.length + 1);
       this.node.style.height = this.height + "px";
       if (this.afterArr.length) this.frame(1);
@@ -89,34 +94,72 @@ export class Flip {
             alter: ~~(this.from / Math.pow(10, d))
           });
     };
-    this.hide(this.from)
+    
     resize();
 
     window.addEventListener("resize", resize);
   }
+  flashColor(comp, colour){
+    comp.animate([{ opacity: 100 }, { opacity: 0 }, { opacity: 100 }], {
+      duration: 500
+    });
+    comp.animate([{ color: "black" }, { color: colour }, { color: "black" }], {
+      duration: 1500
+    });
+  }
+
+  flasher(max, colour) {
+    for(let d = 0; d<=max;d++){
+      this.flashColor(this.ctnrArr[d],colour)
+    }
+    this.flashColor(this.dot,colour)
+    if (max>4){
+      this.flashColor(this.commaArr[0],colour)
+  }
+  if(max>7){
+    this.flashColor(this.commaArr[1],colour)
+  }
+    
+  }
+
   hide(to) {
     for (let i = 10; i > -1; i--) {
       var hide = false;
       if (to < 10 ** i) {
-        hide = true;
-        this.ctnrArr[i].style.display = "none";
-        console.log("Hiding digit " + i);
-      } else if (this.ctnrArr[i].style.display === "none") {
-        this.ctnrArr[i].style.display = "inline-block";
-        console.log("Showing digit " + i);
+        if(this.ctnrArr[i].style.width !== "0px"){
+          hide = true;
+          this.ctnrArr[i].style.width = "0px";
+          this.ctnrArr[i].style.opacity = 0;
+          this.ctnrArr[i].style.transition = "width .2s ";
+        }
+      } else {
+        this.ctnrArr[i].style.width = "10px";
+        this.ctnrArr[i].style.opacity = 100;
+        this.ctnrArr[i].style.transition = "width .2s ";
+
       }
       if (i === 8 && hide) {
-        this.commaArr[1].style.display = "none";
-        console.log("Hiding comma 1");
-      } else if (i === 8 && this.commaArr[1].style.display === "none") {
-        this.commaArr[1].style.display = "inline-block";
+        this.commaArr[1].style.width = "0px";
+        this.commaArr[1].style.opacity = 0;
+        this.commaArr[1].style.transition = "width .2s ";
+
+      } else if (i === 8) {
+        this.commaArr[1].style.width = "6px";
+        this.commaArr[1].style.opacity = 100;
+        this.commaArr[1].style.transition = "width .2s ";
+
       }
 
       if (i === 5 && hide) {
-        this.commaArr[0].style.display = "none";
-        console.log("Hiding comma 1");
-      } else if (i === 5 && this.commaArr[1].style.display === "none") {
-        this.commaArr[0].style.display = "inline-block";
+        this.commaArr[0].style.width = "0px";
+        this.commaArr[0].style.opacity = 0;
+        this.commaArr[0].style.transition = "width .2s ";
+
+      } else if (i === 5 ) {
+        this.commaArr[0].style.width = "6px";
+        this.commaArr[0].style.opacity = 100;
+        this.commaArr[0].style.transition = "width .2s ";
+
       }
     }
   }
@@ -136,6 +179,9 @@ export class Flip {
     let temp = 0;
     for (let d = this.ctnrArr.length - 1; d >= 0; d -= 1) {
       let alter = this.afterArr[d] - this.beforeArr[d];
+      if (this.beforeArr[d] === 9 && this.afterArr[d]!==9) {
+        alter = this.afterArr[d] + 1;
+      }
       temp += alter;
       this._draw({
         digit: d,
@@ -146,10 +192,36 @@ export class Flip {
     }
   }
 
+  
+
   flipTo({ to, duration, easeFn, direct }) {
     if (easeFn) this.easeFn = easeFn;
     if (direct !== undefined) this.direct = direct;
     const len = this.ctnrArr.length;
+    const prev = this.from;
+
+    if (this.flash) {
+        var max = 0 
+        var tempPrev = prev;
+        var tempTo = to;
+        var curPrev;
+        var curTo;
+        for (let d = 0; d < prev.toString().length; d++) {
+          curPrev = tempPrev %10;
+          tempPrev = Math.floor(tempPrev/10);
+          curTo = tempTo % 10;
+          tempTo = Math.floor(tempTo/10);
+          if(curPrev!==curTo){
+            max = d
+          }
+        }
+      if (prev < to) {
+        this.flasher(max, "green");
+      } else if (prev > to) {
+        this.flasher(max, "red");
+      }
+    }
+    setTimeout(()=>{
     this.beforeArr = num2PadNumArr(this.from, len);
     this.afterArr = num2PadNumArr(to, len);
     const start = Date.now();
@@ -166,5 +238,7 @@ export class Flip {
     requestAnimationFrame(tick);
     console.log(to);
     this.hide(to);
+  },500)
+
   }
 }
