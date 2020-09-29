@@ -3,8 +3,8 @@
   "version": "1.1.8",
   "description": "Change number with flipping animation",
   "main": "dist/index.js",
-  "repository": "https://github.com/gaoryrt/flip.git",
-  "author": "gaoryrt",
+  "repository": "https://github.com/SanchitStake/number-flip",
+  "author": "SanchitStake",
   "license": "MIT",
   "dependencies": {
     "gelerator": "^2.1.2"
